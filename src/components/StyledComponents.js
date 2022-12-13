@@ -1,48 +1,78 @@
 import {
-  Button,
-  Box,
-  TextField,
-  InputBase,
-  AppBar,
-  Toolbar,
-  IconButton,
-  Typography,
-  ToggleButton,
-  ToggleButtonGroup,
+    Button,
+    InputBase,
 } from "@mui/material";
-import { styled } from "@mui/material/styles";
-import { createTheme } from "@mui/material/styles";
-import { Link } from "react-router-dom";
 
-const PRIMARY_GREEN = "#39B54A";
-const SECONDARY_NAVY = "#2B5468";
+import { Link } from "react-router-dom";
+import { styled, alpha } from "@mui/material/styles";
+import { createTheme } from "@mui/material/styles";
+
 const TEXT_COLOR = "#5C5C5C";
 
-// export const theme = createTheme({
-//   palette: {
-//     primary: {
-//       // light: will be calculated from palette.primary.main,
-//       main: global.PRIMARY_GREEN,
-//       // dark: will be calculated from palette.primary.main,
-//       // contrastText: will be calculated to contrast with palette.primary.main
-//     },
-//     secondary: {
-//       light: "#0066ff",
-//       main: "#0044ff",
-//       // dark: will be calculated from palette.secondary.main,
-//       contrastText: "#ffcc00",
-//     },
-//   },
-// });
+export const theme = createTheme({
+    status: {
+        danger: '#e53e3e',
+    },
+    palette: {
+        primary: {
+            // light: will be calculated from palette.primary.main,
+            main: "#272932",
+            // dark: will be calculated from palette.primary.main,
+            // contrastText: will be calculated to contrast with palette.primary.main
+        },
+        secondary: {
+            light: "#0066ff",
+            main: "#e7ecef",
+            contrastText: "#ffcc00",
+        },
+    },
+});
 
-export const MainContainer = styled(Box)(() => ({
+export const NavButton = styled(Button)(() => ({
+    fontFamily: 'Roboto Condensed, sans-serif',
+    fontSize: '1rem',
+    textTransform: "none",
+    color: theme.palette.primary.main
+}));
+
+export const Search = styled("div")(({ theme }) => ({
+    position: "relative",
+    borderRadius: '8px',
+    backgroundColor: alpha(theme.palette.common.white, 0.85),
+    "&:hover": {
+        backgroundColor: alpha(theme.palette.common.white, 0.95)
+    },
+    width: "auto",
+    [theme.breakpoints.up("sm")]: {
+        marginLeft: theme.spacing(1),
+    }
+}));
+
+export const SearchIconWrapper = styled("div")(({ theme }) => ({
+    padding: theme.spacing(0, 2),
+    height: "100%",
+    position: "absolute",
+    pointerEvents: "none",
     display: "flex",
     alignItems: "center",
-    justifyContent: "center",
-    width: "100%",
-    minHeight: "100vh",
-  }));
+    justifyContent: "center"
+}));
 
-  export const PrimaryButton = styled(Button)(() => ({
-    textTransform: "none"
-  }));
+export const StyledInputBase = styled(InputBase)(({ theme }) => ({
+    // color: "inherit",
+    "& .MuiInputBase-input": {
+        fontSize: '1.5rem',
+        padding: theme.spacing(1.5, 4, 1.5, 0),
+        // vertical padding + font size from searchIcon
+        paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+        width: "100%",
+        [theme.breakpoints.down('sm')]: {
+            fontSize: '1rem',
+        },
+    }
+}));
+
+export const UnstyledLink = styled(Link)(() => ({
+    textDecoration: "none",
+    color: TEXT_COLOR
+}));
