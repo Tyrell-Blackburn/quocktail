@@ -1,17 +1,15 @@
 import { useParams } from "react-router-dom";
-import Box from "@mui/material/Box";
-import Nav from '../components/Nav';
+import RetrieveDrink from "./RetrieveDrink";
 
 export default function DrinkDetails() {
 
     const { id } = useParams();
+    const url = `https://www.thecocktaildb.com/api/json/v2/9973533/lookup.php?i=${id}`;
 
     return (
         <>
-            <Nav />
-            <Box sx={{ backgroundColor: 'red' }}>
-                Displaying ${id}
-            </Box>
+            <RetrieveDrink url={url} />
         </>
     )
 }
+

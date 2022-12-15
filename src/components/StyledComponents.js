@@ -1,7 +1,5 @@
-import {
-    Button,
-    InputBase,
-} from "@mui/material";
+import Button from "@mui/material/Button";
+import InputBase from "@mui/material/InputBase";
 
 import { Link } from "react-router-dom";
 import { styled, alpha } from "@mui/material/styles";
@@ -35,17 +33,23 @@ export const NavButton = styled(Button)(() => ({
     color: theme.palette.primary.main
 }));
 
+export const RandomButton = styled(Button)(() => ({
+    fontFamily: "Roboto Condensed",
+    fontSize: '2.125rem',
+    lineHeight: 1.5,
+    mr: '1rem',
+    letterSpacing: theme.spacing(.1)
+}));
+
 export const Search = styled("div")(({ theme }) => ({
     position: "relative",
     borderRadius: '8px',
+    marginLeft: theme.spacing(4),
     backgroundColor: alpha(theme.palette.common.white, 0.85),
     "&:hover": {
         backgroundColor: alpha(theme.palette.common.white, 0.95)
     },
-    width: "auto",
-    [theme.breakpoints.up("sm")]: {
-        marginLeft: theme.spacing(1),
-    }
+    width: "auto"
 }));
 
 export const SearchIconWrapper = styled("div")(({ theme }) => ({

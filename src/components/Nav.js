@@ -11,7 +11,7 @@ import Avatar from "@mui/material/Avatar";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 
-import { NavButton, theme } from "./StyledComponents";
+import { NavButton, theme, UnstyledLink } from "./StyledComponents";
 import logo from '../images/logo-quocktail.png';
 import favoritesEmptyIcon from '../images/icon-favorites-empty.png';
 import favoritesFullIcon from '../images/icon-favorites-full.png';
@@ -21,13 +21,34 @@ import favoritesFullIcon from '../images/icon-favorites-full.png';
 {/* <a href="https://www.flaticon.com/free-icons/cocktail" title="cocktail icons">Cocktail icons created by Vitaly Gorbachev - Flaticon</a> */ }
 
 const pages = [
-    "Find a Cocktail",
+    "Home",
     "Search by Ingredient",
     "Advanced Search",
-    "Discover",
+    "Surprise Me",
 ];
 
 const settings = ["Favorites", "Logout"];
+
+const determineLink = (page) => {
+    let link;
+    switch(page) {
+        case "Home":
+            link = '/'
+            break;
+        case "Search by Ingredient":
+            link = '#'
+            break;
+        case "Advanced Search":
+            link = '#'
+            break;
+        case "Surprise Me":
+            link = '/random'
+            break;
+        default:
+            link = '#'
+    }
+    return link;
+}
 
 export default function Nav() {
     const [anchorElNav, setAnchorElNav] = useState(null);
@@ -56,24 +77,23 @@ export default function Nav() {
             <Container maxWidth="xl">
                 <Toolbar disableGutters>
                     <Box sx={{ display: { xs: "none", md: "flex" }, mr: 1 }} component="img" src={logo} alt="Quocktail Logo" />
-                    <Typography
-                        variant="h5"
-                        noWrap
-                        component="a"
-                        href="/"
-                        color={theme.palette.primary.main}
-                        sx={{
-                            mr: 2,
-                            ml: '15px',
-                            display: { xs: "none", md: "flex" },
-                            fontFamily: "Gravitas One",
-                            fontWeight: 700,
-                            letterSpacing: ".3rem",
-                            textDecoration: "none"
-                        }}
-                    >
-                        Quocktail
-                    </Typography>
+                    <UnstyledLink to={`/`}>
+                        <Typography
+                            variant="h5"
+                            color={theme.palette.primary.main}
+                            sx={{
+                                mr: 2,
+                                ml: '15px',
+                                display: { xs: "none", md: "flex" },
+                                fontFamily: "Gravitas One",
+                                fontWeight: 700,
+                                letterSpacing: ".3rem",
+                                textDecoration: "none"
+                            }}
+                        >
+                            Quocktail
+                        </Typography>
+                    </UnstyledLink>
 
                     {/* Mobile menu */}
 
@@ -108,7 +128,7 @@ export default function Nav() {
                         >
                             {pages.map((page) => (
                                 <MenuItem key={page} onClick={handleCloseNavMenu}>
-                                    <Typography textAlign="center">{page}</Typography>
+                                    <Typography>{page}</Typography>
                                 </MenuItem>
                             ))}
                         </Menu>
@@ -137,22 +157,23 @@ export default function Nav() {
 
                     <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
                         {pages.map((page) => (
-                            <NavButton
-                                key={page}
-                                onClick={handleCloseNavMenu}
-                                sx={{
-                                    my: 2, display: "block", fontSize: {
-                                        md: '.97rem', // theme.breakpoints.up('md')
-                                        lg: '1.3rem', // theme.breakpoints.up('lg')
-                                    },
-                                    px: {
-                                        md: '.5rem',
-                                        lg: '1.7rem',
-                                    }
-                                }}
-                            >
-                                {page}
-                            </NavButton>
+                            <UnstyledLink to={determineLink(page)} key={page}>
+                                <NavButton
+                                    onClick={handleCloseNavMenu}
+                                    sx={{
+                                        my: 2, display: "block", fontSize: {
+                                            md: '.97rem', // theme.breakpoints.up('md')
+                                            lg: '1.3rem', // theme.breakpoints.up('lg')
+                                        },
+                                        px: {
+                                            md: '.5rem',
+                                            lg: '1.7rem',
+                                        }
+                                    }}
+                                >
+                                    {page}
+                                </NavButton>
+                            </UnstyledLink>
                         ))}
                     </Box>
 

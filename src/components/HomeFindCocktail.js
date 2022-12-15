@@ -14,6 +14,7 @@ export default function HomeFindCocktail() {
     return (
         <Box sx={{
             color: theme.palette.secondary.main,
+            mt: {xs: '56px', sm: '64px', md: '71px', lg: '80px'},
             width: '100%',
             display: "flex",
             alignItems: "center",

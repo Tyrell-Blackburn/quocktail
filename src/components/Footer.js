@@ -12,7 +12,7 @@ export default function Footer() {
         }}>
 
             <Typography sx={{ p: '40px' }} varient='h3'>
-                Copyright © 2022
+                Copyright © 2022 
                 <Link underline="hover" rel="noopener" target="_blank" href="https://www.tyrellblackburn.com/">
                     Tyrell Blackburn
                 </Link>

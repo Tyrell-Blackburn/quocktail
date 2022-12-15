@@ -1,4 +1,3 @@
-import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
@@ -71,42 +70,8 @@ const ImageMarked = styled('span')(({ theme }) => ({
     transition: theme.transitions.create('opacity'),
 }));
 
-
 export default function HomeGridItem({ cocktail }) {
     return (
-        //     <Grid item sm={12} md={6} lg={4} >
-        //         <UnstyledLink to={`/drink/${cocktail.idDrink}`}>
-        //             <Paper elevation={4} sx={{
-        //                 p: 5,
-        //                 textAlign: 'center',
-        //                 '&:hover': {
-        //                     filter: `blur(8px)`,
-        //                 },
-        //             }}>
-        //                 <Box sx={{
-        //                     width: '100%',
-        //                     borderRadius: '8px',
-        //                     '&:hover': {
-        //                         opacity: `0.5`,
-        //                     },
-        //                 }}
-        //                     component="img"
-        //                     alt={cocktail.strDrink}
-        //                     src={cocktail.strDrinkThumb}
-        //                 />
-        //                 <Typography variant="h6">{cocktail.strDrink}</Typography>
-        //                 {/* <Box sx={{
-        //                     backgroundColor: 'red',
-        //                     // backgroundColor: '#04AA6D',
-        //                     color: 'white',
-        //                     fontSize: '16px',
-        //                     padding: '16px 32px'
-        //                 }}>See Recipe
-        //                 </Box> */}
-        //             </Paper>
-        //         </UnstyledLink>
-        // </Grid >
-
         <Grid item xs={12} md={6} lg={4} >
             <UnstyledLink to={`/drink/${cocktail.idDrink}`}>
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', minWidth: 300, width: '100%' }}>
