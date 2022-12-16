@@ -35,24 +35,21 @@ const Img = styled('img')({
 export default function RetrieveDrink({ url, type }) {
 
     // const [cocktail, setCocktail] = useState(null);
-    // const [refreshData, setRefreshData] = useState(false);
-
-    // useEffect(() => {
-    //     **    const controller = new AbortController();
-    //     **    fetch("/people", **{
-    //           signal: controller.signal,
-    //         }**)
-    //           .then((res) => res.json())
-    //           .then(setPeople);
-    //     **    return () => controller.abort();
-    //     **  }, []);
+    const [refreshData, setRefreshData] = useState(false);
 
     const getCocktail = async () => {
         const { data: response } = await axios.get(url);
         return response.drinks[0];
     };
 
-    const query = useQuery(['cocktailData'], () => getCocktail());
+    const refreshCocktail = () => {
+        query.refetch();
+    }
+
+    const query = useQuery(['cocktailData'], () => getCocktail(), {
+        refetchOnWindowFocus: false,
+        // enabled: false // disable this query from automatically running
+      });
 
     // const loadNewDrink = () => {
     //     fetch(url)
@@ -140,7 +137,7 @@ export default function RetrieveDrink({ url, type }) {
     if (type === 'random') {
         contentType = (
             <>
-                <RandomButton color='secondary' sx={{ mr: theme.spacing(2) }} variant="contained" onClick={() => getCocktail}>
+                <RandomButton color='secondary' sx={{ mr: theme.spacing(2) }} variant="contained" onClick={refreshCocktail}>
                     Click
                 </RandomButton>
                 <Typography sx={{
