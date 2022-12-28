@@ -1,19 +1,17 @@
 import { useEffect, useState } from "react";
 
 import Box from "@mui/material/Box";
-import Nav from '../components/Nav';
+import Nav from './Nav';
 
-import HomeFindCocktail from '../components/HomeFindCocktail';
-import HomeGridItem from '../components/HomeGridItem';
-import HomeCocktailFeed from "../components/HomeCocktailFeed";
-import Footer from "../components/Footer";
+import HomeFindCocktail from './HomeFindCocktail';
+import HomeGridItem from './HomeGridItem';
+import HomeCocktailFeed from "./HomeCocktailFeed";
+import Footer from "./Footer";
 
-export default function Home({ allDrinks }) {
+export default function AdvSearch() {
 
     const [latestCocktails, setLatestCocktails] = useState(null);
     const [favoriteCocktails, setfavoriteCocktails] = useState(null);
-
-    console.log(allDrinks);
 
     // For Newest Cocktails
     useEffect(() => {
@@ -36,9 +34,9 @@ export default function Home({ allDrinks }) {
 
     const renderCocktails = cocktailsToRender => {
         const gridItems = cocktailsToRender.map((cocktail, index) => {
-            if (index > 5) return ''
-            return <HomeGridItem key={cocktail.idDrink} cocktail={cocktail} />
-        })
+                if (index > 5) return ''
+                return <HomeGridItem key={cocktail.idDrink} cocktail={cocktail} />
+            })
         return gridItems;
     }
 
@@ -62,7 +60,7 @@ export default function Home({ allDrinks }) {
 
         }}>
             <Nav />
-            <HomeFindCocktail allDrinks={allDrinks} />
+            <HomeFindCocktail />
             <Box sx={{
                 width: '100%',
                 maxWidth: '1536px',

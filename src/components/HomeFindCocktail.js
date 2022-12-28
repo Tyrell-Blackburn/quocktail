@@ -3,13 +3,13 @@ import {
     Typography,
 } from "@mui/material";
 
-import SearchIcon from "@mui/icons-material/Search";
+import FindCocktail from "./FindCocktail";
 // https://unsplash.com/photos/Sr3bhcYqftA
 import HomeBackground from '../images/home-background.png'
 
-import { theme, Search, SearchIconWrapper, StyledInputBase } from "./StyledComponents";
+import { theme } from "./StyledComponents";
 
-export default function HomeFindCocktail() {
+export default function HomeFindCocktail({allDrinks}) {
 
     return (
         <Box sx={{
@@ -64,24 +64,8 @@ export default function HomeFindCocktail() {
                     },
                     backgroundColor: 'rgba(51, 170, 51, .3)',
                 }} variant="h5">Spark your creativity with 635 timeless cocktail recipies</Typography>
-                <Typography sx={{
-                    fontFamily: "Roboto Condensed",
-                    fontWeight: 400,
-                    letterSpacing: theme.spacing(.1),
-                    mb: theme.spacing(2),
-                    [theme.breakpoints.down('sm')]: {
-                        fontSize: '1.3rem',
-                    },
-                }} variant="h4">Find your poison</Typography>
-                <Search>
-                    <SearchIconWrapper>
-                        <SearchIcon color='secondary' fontSize="large" />
-                    </SearchIconWrapper>
-                    <StyledInputBase
-                        placeholder="Search for a cocktail..."
-                        inputProps={{ "aria-label": "search" }}
-                    />
-                </Search>
+
+                <FindCocktail onHome allDrinks={allDrinks}/>
             </Box>
         </Box >
     )

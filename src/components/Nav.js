@@ -22,9 +22,9 @@ import favoritesFullIcon from '../images/icon-favorites-full.png';
 
 const pages = [
     "Home",
-    "Search by Ingredient",
+    "Search",
     "Advanced Search",
-    "Surprise Me",
+    "Discover",
 ];
 
 const settings = ["Favorites", "Logout"];
@@ -35,13 +35,13 @@ const determineLink = (page) => {
         case "Home":
             link = '/'
             break;
-        case "Search by Ingredient":
-            link = '#'
+        case "Search":
+            link = '/search'
             break;
         case "Advanced Search":
-            link = '#'
+            link = '/advsearch'
             break;
-        case "Surprise Me":
+        case "Discover":
             link = '/random'
             break;
         default:
@@ -76,7 +76,9 @@ export default function Nav() {
         }}>
             <Container maxWidth="xl">
                 <Toolbar disableGutters>
-                    <Box sx={{ display: { xs: "none", md: "flex" }, mr: 1 }} component="img" src={logo} alt="Quocktail Logo" />
+                    <UnstyledLink to={`/`}>
+                        <Box sx={{ display: { xs: "none", md: "flex" }, mr: 1 }} component="img" src={logo} alt="Quocktail Logo" />
+                    </UnstyledLink>
                     <UnstyledLink to={`/`}>
                         <Typography
                             variant="h5"
@@ -178,7 +180,7 @@ export default function Nav() {
                     </Box>
 
                     {/* Right Avatar Menu */}
-                    <Box sx={{ display: { xs: "none", md: "flex" }, mr: 2, width: '32px' }} component="img" src={favoritesEmptyIcon} alt="Favorites Icon" />
+                    {/* <Box sx={{ display: { xs: "none", md: "flex" }, mr: 2, width: '32px' }} component="img" src={favoritesEmptyIcon} alt="Favorites Icon" />
                     <Box sx={{ flexGrow: 0 }}>
                         <Tooltip title="Open settings">
                             <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
@@ -207,7 +209,7 @@ export default function Nav() {
                                 </MenuItem>
                             ))}
                         </Menu>
-                    </Box>
+                    </Box> */}
                 </Toolbar>
             </Container>
         </AppBar>

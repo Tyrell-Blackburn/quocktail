@@ -73,7 +73,7 @@ const ImageMarked = styled('span')(({ theme }) => ({
 export default function HomeGridItem({ cocktail }) {
     return (
         <Grid item xs={12} md={6} lg={4} >
-            <UnstyledLink to={`/drink/${cocktail.idDrink}`}>
+            <UnstyledLink to={`/search/${cocktail.idDrink}`}>
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', minWidth: 300, width: '100%' }}>
                     <ImageButton
                         focusRipple

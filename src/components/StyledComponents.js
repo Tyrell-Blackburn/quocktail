@@ -4,6 +4,7 @@ import InputBase from "@mui/material/InputBase";
 import { Link } from "react-router-dom";
 import { styled, alpha } from "@mui/material/styles";
 import { createTheme } from "@mui/material/styles";
+import TextField from '@mui/material/TextField';
 
 const TEXT_COLOR = "#5C5C5C";
 
@@ -74,6 +75,19 @@ export const StyledInputBase = styled(InputBase)(({ theme }) => ({
             fontSize: '1rem',
         },
     }
+}));
+
+export const StyledTextInput = styled(TextField)(({ theme }) => ({
+    // "& .MuiInputBase-input": {
+    //     fontSize: '1.5rem',
+    //     padding: theme.spacing(1.5, 4, 1.5, 0),
+    //     // vertical padding + font size from searchIcon
+    //     paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+    //     width: "100%",
+    //     [theme.breakpoints.down('sm')]: {
+    //         fontSize: '1rem',
+    //     },
+    // }
 }));
 
 export const UnstyledLink = styled(Link)(() => ({

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 
 export default function useData(url) {
     const [data, setData] = useState(null);
+
     useEffect(() => {
         if (url) {
             let ignore = false;
@@ -17,5 +18,6 @@ export default function useData(url) {
             };
         }
     }, [url]);
+    
     return data;
 }
