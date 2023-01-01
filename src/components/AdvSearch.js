@@ -1,54 +1,102 @@
-import { useEffect, useState } from "react";
 
-import Box from "@mui/material/Box";
+import { useEffect, useState, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query'
+
+// https://unsplash.com/photos/Sr3bhcYqftA
+import HomeBackground from '../images/home-background.png'
 import Nav from './Nav';
-
-import HomeFindCocktail from './HomeFindCocktail';
-import HomeGridItem from './HomeGridItem';
-import HomeCocktailFeed from "./HomeCocktailFeed";
 import Footer from "./Footer";
 
-export default function AdvSearch() {
+import { theme } from "./StyledComponents";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import Checkbox from '@mui/material/Checkbox';
+import IconButton from '@mui/material/IconButton';
+import CommentIcon from '@mui/icons-material/Comment';
 
-    const [latestCocktails, setLatestCocktails] = useState(null);
-    const [favoriteCocktails, setfavoriteCocktails] = useState(null);
+import ImageList from '@mui/material/ImageList';
+import ImageListItem from '@mui/material/ImageListItem';
+import ImageListItemBar from '@mui/material/ImageListItemBar';
+import InfoIcon from '@mui/icons-material/Info';
 
-    // For Newest Cocktails
+import { useTheme } from '@mui/material/styles';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import CardMedia from '@mui/material/CardMedia';
+
+import Grid from '@mui/material/Grid';
+import Paper from '@mui/material/Paper';
+import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
+
+const Item = styled(Paper)(({ theme }) => ({
+    ...theme.typography.body2,
+    textAlign: 'center',
+    color: theme.palette.text.secondary,
+    height: 60,
+    lineHeight: '60px',
+}));
+
+
+export default function AdvSearch({ alcoholDrinks, optionalAlcoholDrinks, noAlcoholDrinks, allDrinks }) {
+    const theme = useTheme();
+
+    const alcoholContentFilter = [{ label: 'Alcoholic', buttonIndex: 0 }, { label: 'Optional Alcohol', buttonIndex: 1 }, { label: 'Non-alcoholic', buttonIndex: 2 }];
+    const alcoholContentDrinkData = useMemo(() => [alcoholDrinks, optionalAlcoholDrinks, noAlcoholDrinks], [alcoholDrinks, optionalAlcoholDrinks, noAlcoholDrinks]);
+    const [alcoholContentChecked, setAlcoholContentChecked] = useState([]);
+    const [visibleDrinks, setVisibleDrinks] = useState([]);
+
+    // useEffect(() => {
+    //     console.log(alcoholDrinks, noAlcoholDrinks, optionalAlcoholDrinks)
+    // }, [alcoholDrinks, noAlcoholDrinks, optionalAlcoholDrinks])
+
     useEffect(() => {
-        fetch(`https://www.thecocktaildb.com/api/json/v2/9973533/recent.php`)
-            .then((res) => res.json())
-            .catch((error) => console.log(error))
-            .then((data) => setLatestCocktails(data.drinks))
-            .catch((error) => console.log(error));
-    }, []);
+        console.log('alcoholContentChecked', alcoholContentChecked)
+        // calculate visible drinks
+        let newVisibleDrinks = [];
 
-    // For Most Popular
+        if (alcoholContentChecked.length === 0 || alcoholContentChecked.length === alcoholContentDrinkData.length) { // all drinks
+            setVisibleDrinks(allDrinks);
+        } else { // some drinks
+            for (let i = 0; i < alcoholContentChecked.length; i++) {
+                newVisibleDrinks = [...newVisibleDrinks, ...alcoholContentDrinkData[alcoholContentChecked[i]]];
+            }
+            setVisibleDrinks(newVisibleDrinks);
+        }
+
+    }, [alcoholContentChecked, alcoholContentDrinkData, allDrinks])
+
     useEffect(() => {
-        fetch(`https://www.thecocktaildb.com/api/json/v2/9973533/popular.php`)
-            .then((res) => res.json())
-            .catch((error) => console.log(error))
-            .then((data) => setfavoriteCocktails(data.drinks))
-            .catch((error) => console.log(error));
-    }, []);
+        console.log('visibleDrinks', visibleDrinks)
+    }, [visibleDrinks])
 
+    const handleAlcoholContentToggle = (value) => () => {
+        const currentIndex = alcoholContentChecked.indexOf(value); // get the position in the array the button number (value) resides (returns -1 if doesn't exists)
+        const newChecked = [...alcoholContentChecked]; // copy existing button array to mutate it
 
-    const renderCocktails = cocktailsToRender => {
-        const gridItems = cocktailsToRender.map((cocktail, index) => {
-                if (index > 5) return ''
-                return <HomeGridItem key={cocktail.idDrink} cocktail={cocktail} />
-            })
-        return gridItems;
-    }
+        // this logic toggles the existence of the button index in the button array
+        if (currentIndex === -1) { // if the button index doesn't exist
+            newChecked.push(value); // then add it
+        } else {
+            newChecked.splice(currentIndex, 1); // if it does exist, then remove it
+        }
+        setAlcoholContentChecked(newChecked); // set the new button array to be the mutated button array
+    };
 
-    let latestCocktailsToRender;
-    if (latestCocktails) {
-        latestCocktailsToRender = renderCocktails(latestCocktails);
-    }
+    const fetchIngredients = (id) => () => {
 
-    let favoriteCocktailsToRender;
-    if (favoriteCocktails) {
-        favoriteCocktailsToRender = renderCocktails(favoriteCocktails);
-    }
+        // look at existing database
+        // if drink exists, then return ingredients
+        
+        // else fetch drink
+        // enter drink in DB
+        // return ingredients 
+
+    };
 
     return (
         <Box sx={{
@@ -60,18 +108,125 @@ export default function AdvSearch() {
 
         }}>
             <Nav />
-            <HomeFindCocktail />
             <Box sx={{
+                color: theme.palette.secondary.main,
+                mt: { xs: '56px', sm: '64px', md: '71px', lg: '80px' },
                 width: '100%',
-                maxWidth: '1536px',
-                display: 'flex',
-                alignItems: 'center',
-                flexDirection: 'column'
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                height: "80vh",
+                background: `
+                linear-gradient(rgba(0, 0, 0, .4), rgba(0, 0, 0, .4)),
+                url(${HomeBackground})`,
+                backgroundPosition: 'center',
+                backgroundSize: 'cover'
             }}>
-                <HomeCocktailFeed title="Newest Cocktails" cocktailFeed={latestCocktailsToRender} />
-                <HomeCocktailFeed title="Most Popular" cocktailFeed={favoriteCocktailsToRender} />
-                <Footer />
+
+                {/* Alcohol Content Filter */}
+
+                <Box sx={{ background: 'blue', height: '100%', minWidth: '300px' }}>
+                    <List sx={{ width: '100%', bgcolor: 'white' }}>
+                        {alcoholContentFilter.map(({ label, buttonIndex }) => {
+                            return (
+                                <ListItem
+                                    key={buttonIndex}
+                                    disablePadding
+                                >
+                                    <ListItemButton sx={{ color: 'red' }} role={undefined} onClick={handleAlcoholContentToggle(buttonIndex)} dense>
+                                        <Checkbox
+                                            edge="start"
+                                            checked={alcoholContentChecked.indexOf(buttonIndex) !== -1} // if the button's index exists in the button array, then check it
+                                            tabIndex={-1}
+                                            disableRipple
+                                            inputProps={{ 'aria-labelledby': label }}
+                                        />
+                                        <ListItemText id={label} primary={label} />
+                                    </ListItemButton>
+                                </ListItem>
+                            );
+                        })}
+                    </List>
+                </Box>
+
+                {/* Results */}
+
+                <Box sx={{ bgcolor: 'white', height: '100%', width: '70%', overflow: "scroll" }}>
+                    <Grid container spacing={0} >
+                        {visibleDrinks.map((drink) => (
+
+                            <Grid item xs={12} sm={12} md={12} key={drink.idDrink}>
+                                <Box sx={{ p: 2, bgcolor: 'white' }} >
+                                    <Card sx={{ display: 'flex', bgcolor: '' }}>
+                                        <CardMedia
+                                            component="img"
+                                            sx={{ width: 100 }}
+                                            image={drink.strDrinkThumb}
+                                            alt={drink.strDrink}
+                                        />
+                                        <CardContent>
+                                            <Typography component="div" variant="h5">
+                                                {drink.strDrink}
+                                            </Typography>
+                                            <Typography variant="subtitle1" color="text.secondary" component="div">
+                                                {fetchIngredients(drink.idDrink)}
+                                            </Typography>
+                                        </CardContent>
+                                    </Card>
+                                </Box>
+                            </Grid>
+                        ))}
+                    </Grid>
+
+                    {/* <ImageList sx={{ height: '100%' }} cols={4} gap={8} >
+                        {visibleDrinks.map((drink) => (
+                            <ImageListItem key={drink.idDrink} >
+                                <img
+                                    src={drink.strDrinkThumb}
+                                    srcSet={drink.strDrinkThumb}
+                                    alt={drink.strDrink}
+                                    loading="lazy"
+                                />
+                                <ImageListItemBar
+                                    title={drink.strDrink}
+                                    subtitle={drink.strDrink}
+                                    actionIcon={
+                                        <IconButton
+                                            sx={{ color: 'rgba(255, 255, 255, 0.54)' }}
+                                            aria-label={`info about ${drink.strDrink}`}
+                                        >
+                                            <InfoIcon />
+                                        </IconButton>
+                                    }
+                                />
+                            </ImageListItem>
+                        ))}
+                    </ImageList> */}
+
+                    {/* {visibleDrinks.map((drink) => (
+                        <Card sx={{ display: 'flex', bgcolor: '' }}>
+                            <CardMedia
+                                component="img"
+                                sx={{ width: 151 }}
+                                image={drink.strDrinkThumb}
+                                alt="Live from space album cover"
+                            />
+                            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                                <CardContent sx={{ flex: '1 0 auto' }}>
+                                    <Typography component="div" variant="h5">
+                                        Live From Space
+                                    </Typography>
+                                    <Typography variant="subtitle1" color="text.secondary" component="div">
+                                        Mac Miller
+                                    </Typography>
+                                </CardContent>
+                            </Box>
+                        </Card>
+                    ))} */}
+
+                </Box>
             </Box>
+            <Footer />
         </Box>
     );
 }

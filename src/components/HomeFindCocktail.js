@@ -11,6 +11,9 @@ import { theme } from "./StyledComponents";
 
 export default function HomeFindCocktail({allDrinks}) {
 
+    let drinkNumber = 635;
+    if (allDrinks) drinkNumber = allDrinks.length;
+
     return (
         <Box sx={{
             color: theme.palette.secondary.main,
@@ -63,7 +66,7 @@ export default function HomeFindCocktail({allDrinks}) {
                         fontSize: '.8rem',
                     },
                     backgroundColor: 'rgba(51, 170, 51, .3)',
-                }} variant="h5">Spark your creativity with 635 timeless cocktail recipies</Typography>
+                }} variant="h5">Spark your creativity with {drinkNumber} timeless cocktail recipies</Typography>
 
                 <FindCocktail onHome allDrinks={allDrinks}/>
             </Box>

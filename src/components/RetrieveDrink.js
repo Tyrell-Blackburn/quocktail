@@ -9,16 +9,18 @@ import Ingredient from '../components/Ingredient';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
-
-import { styled } from '@mui/material/styles';
+import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 import Grid2 from "@mui/material/Unstable_Grid2/Grid2";
+import { styled } from '@mui/material/styles';
 
 import { theme, RandomButton } from "./StyledComponents";
 import FindCocktail from "./FindCocktail";
 
 import Box from "@mui/material/Box";
 import Nav from '../components/Nav';
+
+import formatIngredients from "../utility/formatIngredients";
 
 // https://unsplash.com/photos/Sr3bhcYqftA
 import HomeBackground from '../images/home-background.png'
@@ -31,27 +33,29 @@ const Img = styled('img')({
     maxHeight: '100%',
 });
 
-export default function RetrieveDrink({ url, type }) {
-    console.log(url)
+export default function RetrieveDrink({ url, type, allDrinks }) {
 
-    const getCocktail = async () => {
-        const { data: response } = await axios.get(url);
-        return response.drinks[0];
+    const getCocktail = async (url) => {
+        if (url) {
+            const { data: response } = await axios.get(url);
+            return response.drinks[0];
+        }
     };
 
-    const refreshCocktail = () => {
+    const { data, refetch, fetchStatus, isLoading, error, isError, isSuccess } = useQuery(['data'], () => getCocktail(url), { refetchOnWindowFocus: false });
+
+    // useEffect(() => {
+    //     console.log('isLoading', isLoading, 'fetchStatus', fetchStatus)
+    // }, [isLoading, fetchStatus]);
+
+    // useEffect(() => {
+    //     console.log('data', data)
+    // }, [data]);
+
+    useEffect(() => {
+        console.log('url', url)
         refetch();
-    }
-
-    const { data, refetch, fetchStatus, isLoading, error, isError, isSuccess } = useQuery(['data'], () => getCocktail(), { refetchOnWindowFocus: false });
-
-    useEffect(() => {
-        console.log('isLoading', isLoading, 'fetchStatus', fetchStatus)
-    }, [isLoading, fetchStatus]);
-
-    useEffect(() => {
-        console.log(data)
-    }, [data]);
+    }, [url, refetch]);
 
     const titleCase = (string) => {
         return string.toLowerCase().split(' ').map((word) => {
@@ -64,13 +68,8 @@ export default function RetrieveDrink({ url, type }) {
 
     if (type === 'random') {
         contentType = ( // random cocktail button
-            <Box sx={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                my: theme.spacing(10)
-            }}>
-                <RandomButton color='secondary' sx={{ mr: theme.spacing(2) }} variant="contained" onClick={refreshCocktail}>
+            <>
+                <RandomButton color='secondary' sx={{ mr: theme.spacing(2) }} variant="contained" onClick={refetch}>
                     Click
                 </RandomButton>
                 <Typography sx={{
@@ -84,21 +83,19 @@ export default function RetrieveDrink({ url, type }) {
                 }} variant="h4">
                     to discover a new drink!
                 </Typography>
-            </Box>
+            </>
         )
-    } else contentType = <FindCocktail sx={{ flexDirection: 'column' }} />
+    } else contentType = <FindCocktail sx={{ flexDirection: 'column' }} allDrinks={allDrinks} />
 
-    let instructionsArray;
-    let ingredients = [];
-    let article = '';
     let cocktail;
-
+    
     if (isLoading || fetchStatus === 'fetching') cocktail = <Spinner loading />
     else if (isError) cocktail = <Box sx={{ fontSize: '5rem' }}>{error.message}</Box>
     else if (isSuccess) {
-
-        // splits instructions by '. ' (sentences) then adds adds back a period to the sentences that were stripped of one.
-        instructionsArray = data.strInstructions.split(/\.\s/).map(str => !str.endsWith('.') ? str.concat('.') : str);
+        
+        let ingredients = [];
+        let article = '';
+        let instructionsArray = formatIngredients(data.strInstructions)
 
         // Setting the glass type article to use, "a" or "an"
         const vowels = ['a', 'e', 'i', 'o', 'u'];
@@ -122,16 +119,12 @@ export default function RetrieveDrink({ url, type }) {
             }
         }
 
-        // setting up options object
-        // const option = data
-
-        // });
-
         cocktail = (
             <>
                 <Typography sx={{
                     fontFamily: "Roboto Condensed",
                     fontWeight: 400,
+                    textAlign: 'left',
                     letterSpacing: theme.spacing(.1),
                     mb: theme.spacing(4),
                     [theme.breakpoints.down('sm')]: {
@@ -164,14 +157,18 @@ export default function RetrieveDrink({ url, type }) {
                         <Grid container spacing={2}>
                             <List>
                                 {instructionsArray.map((el, index) => (
-                                    <ListItem divider key={index}>
-                                        <ListItemText
-                                            primaryTypographyProps={{ variant: 'h6' }}
-                                            secondaryTypographyProps={{ variant: 'body1' }}
-                                            primary={`Step ${index + 1}`}
-                                            secondary={el}
-                                        />
-                                    </ListItem>)
+                                    <>
+                                        <ListItem key={index}>
+                                            <ListItemText
+                                                primaryTypographyProps={{ variant: 'h6' }}
+                                                secondaryTypographyProps={{ variant: 'body1' }}
+                                                primary={`Step ${index + 1}`}
+                                                secondary={data.strInstructions.length < 2 ? 'Combine ingredients.' : el}
+                                            />
+                                        </ListItem>
+                                        {index < instructionsArray.length-1 ? <Divider sx={{mx: '16px'}}/> : ''} 
+                                    </>
+                                )
                                 )}
                             </List>
                         </Grid>
@@ -189,7 +186,7 @@ export default function RetrieveDrink({ url, type }) {
                 mt: { xs: '56px', sm: '64px', md: '71px', lg: '80px' },
                 width: '100%',
                 display: "flex",
-                alignItems: "center",
+                alignItems: "flex-start",
                 justifyContent: "center",
                 minHeight: "100vh", // this should be 100vh minus top margin
                 background: `
@@ -211,12 +208,12 @@ export default function RetrieveDrink({ url, type }) {
                     <Box sx={{
                         display: 'flex',
                         alignItems: 'center',
+                        justifyContent: 'flex-start',
                         my: theme.spacing(10),
                         mx: theme.spacing(4)
                     }}>
-
+                        {/* random button or search field */}
                         {contentType}
-
                     </Box>
                     <Box>
                         {url ?

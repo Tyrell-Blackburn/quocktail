@@ -13,26 +13,29 @@ export default function Home({ allDrinks }) {
     const [latestCocktails, setLatestCocktails] = useState(null);
     const [favoriteCocktails, setfavoriteCocktails] = useState(null);
 
-    console.log(allDrinks);
+    // useEffect(() => {
+    //     console.log(allDrinks);
+    // }, [allDrinks])
+
+    const fetchData = (url, setState) => {
+        fetch(url)
+            .then((res) => {
+                if (!res.ok) throw Error('could not fetch the data for that resource');
+                return res.json()
+            })
+            .then((data) => setState(data.drinks))
+            .catch((error) => console.log(error));
+    }
 
     // For Newest Cocktails
     useEffect(() => {
-        fetch(`https://www.thecocktaildb.com/api/json/v2/9973533/recent.php`)
-            .then((res) => res.json())
-            .catch((error) => console.log(error))
-            .then((data) => setLatestCocktails(data.drinks))
-            .catch((error) => console.log(error));
+        fetchData('https://www.thecocktaildb.com/api/json/v2/9973533/recent.php', setLatestCocktails)
     }, []);
 
     // For Most Popular
     useEffect(() => {
-        fetch(`https://www.thecocktaildb.com/api/json/v2/9973533/popular.php`)
-            .then((res) => res.json())
-            .catch((error) => console.log(error))
-            .then((data) => setfavoriteCocktails(data.drinks))
-            .catch((error) => console.log(error));
+        fetchData('https://www.thecocktaildb.com/api/json/v2/9973533/popular.php', setfavoriteCocktails)
     }, []);
-
 
     const renderCocktails = cocktailsToRender => {
         const gridItems = cocktailsToRender.map((cocktail, index) => {
@@ -72,8 +75,8 @@ export default function Home({ allDrinks }) {
             }}>
                 <HomeCocktailFeed title="Newest Cocktails" cocktailFeed={latestCocktailsToRender} />
                 <HomeCocktailFeed title="Most Popular" cocktailFeed={favoriteCocktailsToRender} />
-                <Footer />
             </Box>
+            <Footer />
         </Box>
     );
 }

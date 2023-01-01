@@ -1,85 +1,76 @@
 import Typography from "@mui/material/Typography";
-import { theme, Search, SearchIconWrapper, StyledInputBase, StyledTextInput } from "./StyledComponents";
+import { theme } from "./StyledComponents";
 import SearchIcon from "@mui/icons-material/Search";
 import Box from "@mui/material/Box";
 import { alpha } from "@mui/material/styles";
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 
-import { Link, Routes, Route, useNavigate } from 'react-router-dom';
-import { ConstructionOutlined } from "@mui/icons-material";
+import { useNavigate } from 'react-router-dom';
 
 export default function FindCocktail({ onHome, allDrinks }) {
-    console.log(allDrinks);
+
     const navigate = useNavigate();
 
-    // value selected by user from autofill options
-    const [selectedValue, setSelectedValue] = useState('');
-    // value typed by user into search
-    const [typedValue, setTypedValue] = useState('');
-
-    const [searchData, setSearchData] = useState(allDrinks);
+    const [selectedValue, setSelectedValue] = useState(''); // value selected by user
+    const [typedValue, setTypedValue] = useState(''); // value typed by user
     const [searchError, setSearchError] = useState(false);
-    console.log(allDrinks);
 
     // useEffect(() => {
-    //     const controller = new AbortController();
-    //     fetch(`https://www.thecocktaildb.com/api/json/v2/9973533/filter.php?a=Alcoholic`, { signal: controller.signal })
-    //         .then((res) => res.json())
-    //         .catch((error) => console.log(error))
-    //         .then((data) => setSearchData(data.drinks))
-    //         .catch((error) => console.log(error));
-    //     return () => {
-    //         controller.abort();
-    //     }
-    // }, [])
+    //     console.log('typedValue', typedValue)
+    // }, [typedValue]);
+
+    // useEffect(() => {
+    //     console.log('selectedValue', selectedValue)
+    // }, [selectedValue]);   
 
     // navigation logic after a cocktail is selected in search field 
     if (selectedValue) {
-        console.log(selectedValue);
+        // console.log('in selectedValue', selectedValue);
         setSearchError(false);
-        if (selectedValue === '') setSearchError(true);
+        if (selectedValue === '') setSearchError(true); // if nothing is selected throw error
 
         const chosenDrink = allDrinks.filter(el => {
             return el.strDrink.toLowerCase() === selectedValue.toLowerCase();
         })
         const id = chosenDrink[0].idDrink;
 
-        if (id) navigate(`/search/${id}`);        
-    }
-
-    const handleClick = (e) => {
-        console.log(e.target.value);
+        if (id) {
+            navigate(`/search/${id}`);
+            setSelectedValue('');
+        } 
     }
 
     // when pressing enter on the search field
     const handleSubmit = e => {
         e.preventDefault();
         setSearchError(false);
+        console.log('submit');
 
-        console.log(typedValue);
-    
         // pull out drink from database based on typed text
         const chosenDrink = allDrinks.filter(el => {
             return el.strDrink.toLowerCase() === typedValue.toLowerCase();
         })
-        console.log(chosenDrink);
 
         // get drink ID and navigate to URL
         if (chosenDrink.length > 0) {
             const id = chosenDrink[0].idDrink;
             if (id) navigate(`/search/${id}`);
         } else {
-            // set error as it means the search string did not match anything in the database
+            // throw error when search string does not match drink in database
             setSearchError(true); 
         } 
     }
 
-    const handleTypedValue = (newValue) => {
-        console.log('typing')
-        setSearchError(false);
-        setTypedValue(newValue);
+    const handleTypedValue = (event, newValue) => {
+        // I'm trying to make it so that when you select a drink from the drop down, it loads as normal, but resets the text field to ''. I'm trying to only set the typed value if it's a click event, not a changed one
+        // also if user presses back, the search box should change to the text of the previous drink
+        // console.log(event);
+        // if (event.type === 'change') {
+            setSearchError(false);
+            setTypedValue(newValue);
+        // }
     }
 
     let options;
@@ -126,20 +117,16 @@ export default function FindCocktail({ onHome, allDrinks }) {
 
                         // value typed by user
                         inputValue={typedValue}
-                        onInputChange={(event, newInputValue) => handleTypedValue(newInputValue)}
-
+                        onInputChange={(event, newInputValue) => handleTypedValue(event, newInputValue)}
+                        clearOnBlur
                         disablePortal
                         id="combo-box-demo"
                         options={options}
-                        sx={{ width: 300 }}
-                        onClick={e => handleClick()}
+                        sx={{ width: 316 }}
                         renderInput={(params) => <TextField
                             autoFocus
-                            fullWidth
                             hiddenLabel
                             error={searchError}
-                            // onClick={e => handleClick()}
-                            // onChange={e => setSearch(e.target.value)}
                             placeholder="Search for a cocktail"
                             type="text"
                             InputLabelProps={{ shrink: true }}
@@ -151,14 +138,3 @@ export default function FindCocktail({ onHome, allDrinks }) {
         </>
     )
 }
-
-// "& .MuiInputBase-input": {
-//     fontSize: '1.5rem',
-//     padding: theme.spacing(1.5, 4, 1.5, 0),
-//     // vertical padding + font size from searchIcon
-//     paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-//     width: "100%",
-//     [theme.breakpoints.down('sm')]: {
-//         fontSize: '1rem',
-//     },
-// }

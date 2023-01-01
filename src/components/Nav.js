@@ -130,7 +130,9 @@ export default function Nav() {
                         >
                             {pages.map((page) => (
                                 <MenuItem key={page} onClick={handleCloseNavMenu}>
-                                    <Typography>{page}</Typography>
+                                    <UnstyledLink to={determineLink(page)} key={page}>
+                                        <Typography>{page}</Typography>
+                                    </UnstyledLink>
                                 </MenuItem>
                             ))}
                         </Menu>

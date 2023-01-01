@@ -1,5 +1,4 @@
 import Typography from "@mui/material/Typography";
-import Box from "@mui/material/Box";
 import Grid2 from "@mui/material/Unstable_Grid2/Grid2";
 
 export default function Ingredient({ ingredient, measure, index }) {
