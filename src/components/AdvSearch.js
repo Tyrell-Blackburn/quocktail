@@ -2,6 +2,8 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query'
 
+import { titleCase } from '../utility/customMethods';
+
 // https://unsplash.com/photos/Sr3bhcYqftA
 import HomeBackground from '../images/home-background.png'
 import Nav from './Nav';
@@ -32,6 +34,7 @@ import CardMedia from '@mui/material/CardMedia';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
+import Ingredient from './Ingredient';
 
 const Item = styled(Paper)(({ theme }) => ({
     ...theme.typography.body2,
@@ -46,29 +49,30 @@ export default function AdvSearch({ alcoholDrinks, optionalAlcoholDrinks, noAlco
     const theme = useTheme();
 
     const alcoholContentFilter = [{ label: 'Alcoholic', buttonIndex: 0 }, { label: 'Optional Alcohol', buttonIndex: 1 }, { label: 'Non-alcoholic', buttonIndex: 2 }];
-    const alcoholContentDrinkData = useMemo(() => [alcoholDrinks, optionalAlcoholDrinks, noAlcoholDrinks], [alcoholDrinks, optionalAlcoholDrinks, noAlcoholDrinks]);
     const [alcoholContentChecked, setAlcoholContentChecked] = useState([]);
     const [visibleDrinks, setVisibleDrinks] = useState([]);
 
-    // useEffect(() => {
-    //     console.log(alcoholDrinks, noAlcoholDrinks, optionalAlcoholDrinks)
-    // }, [alcoholDrinks, noAlcoholDrinks, optionalAlcoholDrinks])
-
     useEffect(() => {
-        console.log('alcoholContentChecked', alcoholContentChecked)
         // calculate visible drinks
         let newVisibleDrinks = [];
 
-        if (alcoholContentChecked.length === 0 || alcoholContentChecked.length === alcoholContentDrinkData.length) { // all drinks
-            setVisibleDrinks(allDrinks);
-        } else { // some drinks
-            for (let i = 0; i < alcoholContentChecked.length; i++) {
-                newVisibleDrinks = [...newVisibleDrinks, ...alcoholContentDrinkData[alcoholContentChecked[i]]];
-            }
-            setVisibleDrinks(newVisibleDrinks);
-        }
 
-    }, [alcoholContentChecked, alcoholContentDrinkData, allDrinks])
+        alcoholContentChecked.forEach(el => {
+            switch (el) {
+                case 0:
+                    newVisibleDrinks = [...newVisibleDrinks, ...allDrinks.filter(el => el.strAlcoholic === 'Alcoholic')];
+                    break;
+                case 1:
+                    newVisibleDrinks = [...newVisibleDrinks, ...allDrinks.filter(el => el.strAlcoholic === 'Optional alcohol')];
+                    break;
+                case 2:
+                    newVisibleDrinks = [...newVisibleDrinks, ...allDrinks.filter(el => el.strAlcoholic === 'Non alcoholic')];
+                    break;
+                default:
+            }
+        })
+        setVisibleDrinks(newVisibleDrinks);
+    }, [alcoholContentChecked, allDrinks])
 
     useEffect(() => {
         console.log('visibleDrinks', visibleDrinks)
@@ -87,16 +91,23 @@ export default function AdvSearch({ alcoholDrinks, optionalAlcoholDrinks, noAlco
         setAlcoholContentChecked(newChecked); // set the new button array to be the mutated button array
     };
 
-    const fetchIngredients = (id) => () => {
+    const getIngredientsArray = (drink) => {
+        let ingredients = [];
 
-        // look at existing database
-        // if drink exists, then return ingredients
-        
-        // else fetch drink
-        // enter drink in DB
-        // return ingredients 
+        for (const property in drink) {
+            if (property.startsWith('strIngredient') && drink[property]) {
+                ingredients.push(titleCase(drink[property]));
+            }
+        }
 
-    };
+        return ingredients;
+    }
+
+    const isSearchedIngredient = ingredient => {
+        // write logic to compare with selected ingredients here
+        return true;
+    }
+
 
     return (
         <Box sx={{
@@ -155,7 +166,7 @@ export default function AdvSearch({ alcoholDrinks, optionalAlcoholDrinks, noAlco
                     <Grid container spacing={0} >
                         {visibleDrinks.map((drink) => (
 
-                            <Grid item xs={12} sm={12} md={12} key={drink.idDrink}>
+                            <Grid item xs={12} sm={12} md={6} key={drink.idDrink}>
                                 <Box sx={{ p: 2, bgcolor: 'white' }} >
                                     <Card sx={{ display: 'flex', bgcolor: '' }}>
                                         <CardMedia
@@ -169,7 +180,11 @@ export default function AdvSearch({ alcoholDrinks, optionalAlcoholDrinks, noAlco
                                                 {drink.strDrink}
                                             </Typography>
                                             <Typography variant="subtitle1" color="text.secondary" component="div">
-                                                {fetchIngredients(drink.idDrink)}
+                                                {getIngredientsArray(drink).map(el => (
+                                                    isSearchedIngredient(el)
+                                                        ? <Box component="span" sx={{ color: 'green' }}>{el}, </Box>
+                                                        : <Box component="span" sx={{ color: 'red' }}>{el}, </Box>
+                                                ))}
                                             </Typography>
                                         </CardContent>
                                     </Card>

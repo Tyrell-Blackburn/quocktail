@@ -20,7 +20,7 @@ import FindCocktail from "./FindCocktail";
 import Box from "@mui/material/Box";
 import Nav from '../components/Nav';
 
-import formatIngredients from "../utility/formatIngredients";
+import formatInstructions from "../utility/formatInstructions";
 
 // https://unsplash.com/photos/Sr3bhcYqftA
 import HomeBackground from '../images/home-background.png'
@@ -95,7 +95,7 @@ export default function RetrieveDrink({ url, type, allDrinks }) {
         
         let ingredients = [];
         let article = '';
-        let instructionsArray = formatIngredients(data.strInstructions)
+        let instructionsArray = formatInstructions(data.strInstructions)
 
         // Setting the glass type article to use, "a" or "an"
         const vowels = ['a', 'e', 'i', 'o', 'u'];

@@ -1,4 +1,4 @@
-export default function formatIngredients(string) {
+export default function formatInstructions(string) {
 
     // removing '...'
     let instructionsString = string.replace(/\.\.\./g, '');
