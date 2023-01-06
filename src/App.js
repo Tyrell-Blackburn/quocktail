@@ -1,6 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { useQuery, useQueries } from '@tanstack/react-query'
+import { useQueries } from '@tanstack/react-query'
 import axios from 'axios';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from "@mui/material/Box";
@@ -13,22 +13,15 @@ import "./styles.css";
 
 import ScrollToTop from "./utility/ScrollToTop";
 
-import {
-  createTheme,
-  responsiveFontSizes,
-  ThemeProvider,
-} from '@mui/material/styles';
+import { createTheme, responsiveFontSizes, ThemeProvider } from '@mui/material/styles';
 
-axios.defaults.timeout = 6000;
+axios.defaults.timeout = 6000; // set axios timeout in ms
 
+// set responsiveness sizes for text
 let theme = createTheme();
 theme = responsiveFontSizes(theme);
 
-const URL_ALCOHOL = 'https://www.thecocktaildb.com/api/json/v2/9973533/filter.php?a=Alcoholic';
-const URL_NO_ALCOHOL = 'https://www.thecocktaildb.com/api/json/v2/9973533/filter.php?a=Non_Alcoholic';
-const URL_OPTIONAL_ALCOHOL = 'https://www.thecocktaildb.com/api/json/v2/9973533/filter.php?a=Optional_alcohol';
-
-let queryKeys = []; // ['a', 'b', 'c', 'd', ...]
+let queryKeys = []; // becomes ['a', 'b', 'c', 'd', ... 0, 1, 2, 3 ...]
 
 for (let i = 0; i < 26; i ++) {
   const charCode = String.fromCharCode(97 + i);
@@ -45,6 +38,7 @@ function App() {
   const [allDrinks, setAllDrinks] = useState(null);
   const [allLoading, setAllLoading] = useState(true);
 
+  // extra all detailed data on drinks from the API
   const allDrinksData = useQueries({
     queries: queryKeys.map((key) => {
       return {
@@ -60,25 +54,22 @@ function App() {
 
     for (let i = 0; i < allDrinksData.length; i ++ ) {
       if (allDrinksData[i].fetchStatus !== 'idle') {
-        // console.log('loading', allDrinksData)
         loading = true;
         break;
       } 
     }
 
     if (!loading) {
-      // console.log('not loading', allDrinksData);
       let flattenedData = [];
 
       allDrinksData.forEach(el => {
         if (el.data) {
-          // console.log(el.data);
           flattenedData = [...flattenedData, ...el.data]
         } 
       })
-      // console.log('data not sorted', flattenedData)
-      // const sortedData = flattenedData.sort((a, b) => a.strDrink.localeCompare(b.strDrink)); // sort drink arrays
-      // console.log('data  sorted', sortedData)
+      
+      flattenedData.sort((a, b) => a.strDrink.localeCompare(b.strDrink)); // sorts drinks array alphabetically
+
       if (!allDrinks) setAllDrinks(flattenedData);
       setAllLoading(false);
     } 
@@ -100,22 +91,16 @@ function App() {
     }
   };
 
-  const alcoholData = useQuery(['alcoholDrinks'], () => getData(URL_ALCOHOL), { refetchOnWindowFocus: false });
-  const noAlcoholData = useQuery(['noAlcoholDrinks'], () => getData(URL_NO_ALCOHOL), { refetchOnWindowFocus: false });
-  const optionalAlcoholData = useQuery(['optionalAlcoholDrinks'], () => getData(URL_OPTIONAL_ALCOHOL), { refetchOnWindowFocus: false });
-
-
-  const error = alcoholData.isError || noAlcoholData.isError || optionalAlcoholData.isError;
-  const success = alcoholData.isSuccess && noAlcoholData.isSuccess && optionalAlcoholData.isSuccess;
-
+  const error = allDrinksData.isError;
+  const success = allDrinksData.isSuccess;
 
   let invalidURL = false;
   let noData = false;
   const timeoutMessage = `timeout of ${axios.defaults.timeout}ms exceeded`;
 
   if (success) {
-    if (alcoholData.data === 'None Found' || noAlcoholData.data === 'None Found' || optionalAlcoholData.data === 'None Found') noData = true;
-    else if (alcoholData.data.message === timeoutMessage || noAlcoholData.data.message === timeoutMessage || optionalAlcoholData.data.message === timeoutMessage) invalidURL = true;
+    if (allDrinksData.data === 'None Found') noData = true;
+    else if (allDrinksData.data.message === timeoutMessage) invalidURL = true;
   }
 
   return (
@@ -131,7 +116,7 @@ function App() {
                   <Route path="/" element={<Home allDrinks={allDrinks} />} />
                   <Route path="/search" element={<Search allDrinks={allDrinks} />} />
                   <Route path="/search/:id" element={<Search allDrinks={allDrinks} />} />
-                  <Route path="/advsearch" element={<AdvSearch alcoholDrinks={alcoholData.data} noAlcoholDrinks={noAlcoholData.data} optionalAlcoholDrinks={optionalAlcoholData.data} allDrinks={allDrinks} />} />
+                  <Route path="/advsearch" element={<AdvSearch allDrinks={allDrinks} />} />
                   <Route path="/random" element={<RandomDrink />} />
                 </Routes>
               </ThemeProvider>

@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useQuery } from '@tanstack/react-query'
 import axios from 'axios';
 
@@ -42,20 +41,7 @@ export default function RetrieveDrink({ url, type, allDrinks }) {
         }
     };
 
-    const { data, refetch, fetchStatus, isLoading, error, isError, isSuccess } = useQuery(['data'], () => getCocktail(url), { refetchOnWindowFocus: false });
-
-    // useEffect(() => {
-    //     console.log('isLoading', isLoading, 'fetchStatus', fetchStatus)
-    // }, [isLoading, fetchStatus]);
-
-    // useEffect(() => {
-    //     console.log('data', data)
-    // }, [data]);
-
-    useEffect(() => {
-        console.log('url', url)
-        refetch();
-    }, [url, refetch]);
+    const { data, refetch, fetchStatus, isLoading, error, isError, isSuccess } = useQuery([url], () => getCocktail(url), { refetchOnWindowFocus: false });
 
     const titleCase = (string) => {
         return string.toLowerCase().split(' ').map((word) => {
