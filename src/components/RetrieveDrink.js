@@ -3,7 +3,6 @@ import axios from 'axios';
 
 import Spinner from './Spinner';
 import Typography from "@mui/material/Typography";
-import Ingredient from '../components/Ingredient';
 
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -12,7 +11,9 @@ import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 import Grid2 from "@mui/material/Unstable_Grid2/Grid2";
 import { styled } from '@mui/material/styles';
+import Skeleton from '@mui/material/Skeleton';
 
+import Ingredient from '../components/Ingredient';
 import { theme, RandomButton } from "./StyledComponents";
 import FindCocktail from "./FindCocktail";
 
@@ -25,14 +26,19 @@ import formatInstructions from "../utility/formatInstructions";
 import HomeBackground from '../images/home-background.png'
 
 import Paper from '@mui/material/Paper';
+import { useEffect, useState } from 'react';
 
 const Img = styled('img')({
+    borderRadius: '8px',
     display: 'block',
     maxWidth: '100%',
     maxHeight: '100%',
 });
 
 export default function RetrieveDrink({ url, type, allDrinks }) {
+
+    const [imgLoading, setImgLoading] = useState(true);
+    const skeleton = <Skeleton variant="rounded" sx={{ height: '100%', width: '100%' }} />
 
     const getCocktail = async (url) => {
         if (url) {
@@ -41,7 +47,20 @@ export default function RetrieveDrink({ url, type, allDrinks }) {
         }
     };
 
-    const { data, refetch, fetchStatus, isLoading, error, isError, isSuccess } = useQuery([url], () => getCocktail(url), { refetchOnWindowFocus: false });
+    const {
+        data,
+        refetch,
+        isLoading,
+        isFetching,
+        error,
+        isError,
+        isSuccess } =
+        useQuery({
+            queryKey: [url],
+            queryFn: () => getCocktail(url),
+            refetchOnWindowFocus: false,
+            // keepPreviousData: true
+        });
 
     const titleCase = (string) => {
         return string.toLowerCase().split(' ').map((word) => {
@@ -49,36 +68,56 @@ export default function RetrieveDrink({ url, type, allDrinks }) {
         }).join(' ');
     }
 
+    // useEffect(() => { console.log('isFetching', isFetching, 'isLoading', isLoading) }, [isFetching, isLoading])
+
     // this variable holds either the random cocktail button components or the find cocktail ones
     let contentType;
 
     if (type === 'random') {
         contentType = ( // random cocktail button
-            <>
-                <RandomButton color='secondary' sx={{ mr: theme.spacing(2) }} variant="contained" onClick={refetch}>
-                    Click
+            <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'center' }}>
+                <RandomButton color='secondary' sx={{
+                    mr: { xs: theme.spacing(0), sm: theme.spacing(2) },
+                    mb: { xs: theme.spacing(4), sm: theme.spacing(0) }
+                }}
+                    variant="contained" onClick={refetch}>
+                    Tap
                 </RandomButton>
                 <Typography sx={{
                     fontFamily: "Roboto Condensed",
-                    textAlign: 'right',
                     fontWeight: 400,
                     letterSpacing: theme.spacing(.1),
-                    [theme.breakpoints.down('sm')]: {
-                        fontSize: '1rem',
-                    }
+                    fontSize: { xs: '1.8rem', sm: '1.8rem', md: '1.8rem' }
                 }} variant="h4">
                     to discover a new drink!
                 </Typography>
-            </>
+            </Box>
         )
-    } else contentType = <FindCocktail sx={{ flexDirection: 'column' }} allDrinks={allDrinks} />
+    } else contentType = (
+        <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'center' }}>
+            <Typography sx={{
+                fontFamily: "Roboto Condensed",
+                fontWeight: 400,
+                letterSpacing: theme.spacing(.1),
+                fontSize: { xs: '1.8rem', sm: '1.5rem', md: '1.8rem' },
+                mr: { xs: '', sm: theme.spacing(4) },
+                mb: { xs: theme.spacing(4), sm: theme.spacing(0) },
+            }} variant="h4">Find your poison
+            </Typography>
+            <FindCocktail allDrinks={allDrinks} />
+        </Box>
+    )
 
     let cocktail;
-    
-    if (isLoading || fetchStatus === 'fetching') cocktail = <Spinner loading />
-    else if (isError) cocktail = <Box sx={{ fontSize: '5rem' }}>{error.message}</Box>
+
+    if (isLoading || isFetching) {
+        if (imgLoading === false) setImgLoading(true);
+        cocktail = <Spinner loading />
+    } else if (isError) cocktail = <Box sx={{ fontSize: '5rem' }}>{error.message}</Box>
     else if (isSuccess) {
-        
+
+        const drinkImg = <Img alt="drink image" src={data.strDrinkThumb} onLoad={() => setImgLoading(false)} />
+
         let ingredients = [];
         let article = '';
         let instructionsArray = formatInstructions(data.strInstructions)
@@ -119,7 +158,8 @@ export default function RetrieveDrink({ url, type, allDrinks }) {
                 }} variant="h2">{data.strDrink}</Typography>
                 <Grid container spacing={2}>
                     <Grid item xs={12} md={6} lg={4} >
-                        <Img alt="drink image" src={data.strDrinkThumb} />
+                        {imgLoading ? skeleton : ''}
+                        {drinkImg}
                     </Grid>
                     <Grid item xs={12} md={6} lg={4} >
                         <Typography gutterBottom variant="h4" component="div">
@@ -128,7 +168,7 @@ export default function RetrieveDrink({ url, type, allDrinks }) {
                         <Grid2 container spacing={2} sx={{ backgroundColor: '' }}>
                             {ingredients
                                 ? ingredients.map((ingredient, index) => (
-                                    <Ingredient key={`id${index}`} ingredient={ingredient.ingredient} measure={ingredient.measure} index={index} />))
+                                    <Ingredient key={`id${index}`} ingredient={ingredient.ingredient} measure={ingredient.measure} index={index} isLoading={isLoading} />))
                                 : ''
                             }
                         </Grid2>
@@ -152,7 +192,7 @@ export default function RetrieveDrink({ url, type, allDrinks }) {
                                                 secondary={data.strInstructions.length < 2 ? 'Combine ingredients.' : el}
                                             />
                                         </ListItem>
-                                        {index < instructionsArray.length-1 ? <Divider sx={{mx: '16px'}}/> : ''} 
+                                        {index < instructionsArray.length - 1 ? <Divider  sx={{ mx: '16px' }} /> : ''}
                                     </>
                                 )
                                 )}
@@ -193,9 +233,8 @@ export default function RetrieveDrink({ url, type, allDrinks }) {
                 }}>
                     <Box sx={{
                         display: 'flex',
-                        alignItems: 'center',
                         justifyContent: 'flex-start',
-                        my: theme.spacing(10),
+                        my: { xs: theme.spacing(4), sm: theme.spacing(10) },
                         mx: theme.spacing(4)
                     }}>
                         {/* random button or search field */}

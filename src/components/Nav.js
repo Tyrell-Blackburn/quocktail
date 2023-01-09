@@ -16,9 +16,8 @@ import logo from '../images/logo-quocktail.png';
 import favoritesEmptyIcon from '../images/icon-favorites-empty.png';
 import favoritesFullIcon from '../images/icon-favorites-full.png';
 
-// Attribution
+// Attribution for when add favorites
 {/* <a href="https://www.flaticon.com/free-icons/heart" title="heart icons">Heart icons created by Kiranshastry - Flaticon</a> */ }
-{/* <a href="https://www.flaticon.com/free-icons/cocktail" title="cocktail icons">Cocktail icons created by Vitaly Gorbachev - Flaticon</a> */ }
 
 const pages = [
     "Home",
@@ -77,7 +76,7 @@ export default function Nav() {
             <Container maxWidth="xl">
                 <Toolbar disableGutters>
                     <UnstyledLink to={`/`}>
-                        <Box sx={{ display: { xs: "none", md: "flex" }, mr: 1 }} component="img" src={logo} alt="Quocktail Logo" />
+                        <Box sx={{ display: { xs: "none", md: "flex" }, mr: 1, height: '32px' }} component="img" src={logo} alt="Quocktail Logo" />
                     </UnstyledLink>
                     <UnstyledLink to={`/`}>
                         <Typography
@@ -137,7 +136,7 @@ export default function Nav() {
                             ))}
                         </Menu>
                     </Box>
-                    <Box sx={{ display: { xs: "flex", md: "none" }, mr: 1 }} component="img" src={logo} alt="Quocktail Logo" />
+                    <Box sx={{ display: { xs: "flex", md: "none" }, mr: 1, height: '32px' }} component="img" src={logo} alt="Quocktail Logo" />
                     <Typography
                         variant="h5"
                         noWrap

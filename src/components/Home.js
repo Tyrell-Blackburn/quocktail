@@ -13,10 +13,6 @@ export default function Home({ allDrinks }) {
     const [latestCocktails, setLatestCocktails] = useState(null);
     const [favoriteCocktails, setfavoriteCocktails] = useState(null);
 
-    // useEffect(() => {
-    //     console.log(allDrinks);
-    // }, [allDrinks])
-
     const fetchData = (url, setState) => {
         fetch(url)
             .then((res) => {

@@ -9,7 +9,7 @@ import HomeBackground from '../images/home-background.png'
 
 import { theme } from "./StyledComponents";
 
-export default function HomeFindCocktail({allDrinks}) {
+export default function HomeFindCocktail({ allDrinks }) {
 
     let drinkNumber = 635;
     if (allDrinks) drinkNumber = allDrinks.length;
@@ -17,12 +17,12 @@ export default function HomeFindCocktail({allDrinks}) {
     return (
         <Box sx={{
             color: theme.palette.secondary.main,
-            mt: {xs: '56px', sm: '64px', md: '71px', lg: '80px'},
+            mt: { xs: '56px', sm: '64px', md: '71px', lg: '80px' },
             width: '100%',
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            height: "1000px",
+            height: { sm: "1000px", xs: '600px' },
             background: `
                 linear-gradient(rgba(0, 0, 0, .4), rgba(0, 0, 0, .4)),
                 url(${HomeBackground})`,
@@ -67,9 +67,18 @@ export default function HomeFindCocktail({allDrinks}) {
                     },
                     backgroundColor: 'rgba(51, 170, 51, .3)',
                 }} variant="h5">Spark your creativity with {drinkNumber} timeless cocktail recipies</Typography>
-
-                <FindCocktail onHome allDrinks={allDrinks}/>
+                <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
+                    <Typography sx={{
+                        fontFamily: "Roboto Condensed",
+                        fontWeight: 400,
+                        letterSpacing: theme.spacing(.1),
+                        textAlign: 'right',
+                        fontSize: { xs: '1.6rem', sm: '1.8rem', md: '1.8rem' },
+                        pb: '1.5rem'
+                    }} variant="h4">Find your poison</Typography>
+                    <FindCocktail onHome allDrinks={allDrinks} />
+                </Box>
             </Box>
-        </Box >
+        </Box>
     )
 }

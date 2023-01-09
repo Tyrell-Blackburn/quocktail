@@ -1,57 +1,44 @@
 import Typography from "@mui/material/Typography";
-import Paper from "@mui/material/Paper";
-import Chip from '@mui/material/Chip';
-import { styled } from '@mui/material/styles';
+import Box from "@mui/material/Box";
+import Autocomplete from "@mui/material/Autocomplete";
+import TextField from "@mui/material/TextField";
+import Checkbox from "@mui/material/Checkbox";
+import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
+import CheckBoxIcon from '@mui/icons-material/CheckBox';
 
-const ListItemStyled = styled('li')(({ theme }) => ({
-    margin: theme.spacing(0.5),
-}));
+const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
+const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
-
-export default function Filter({ title, type, sourceList, fromSetter, toSetter }) {
-
-    const changeFilter = (elementToMove, fromSetter, toSetter) => () => {
-
-        if (!toSetter) {
-            // remove from source
-            fromSetter(prevState => prevState.filter(sourceElement => sourceElement !== elementToMove))
-            return
-        }
-
-        // remove from source
-        fromSetter(prevState => prevState.filter(sourceElement => sourceElement !== elementToMove))
-        // add to destination
-        toSetter(prevState => [...prevState, elementToMove]);
-    };
+export default function Filter({ title, sourceList, setter }) {
 
     return (
-        <>
+        <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%'}}>
             <Typography component="div" variant="h6">
                 {title}
             </Typography>
-            <Paper
-                sx={{
-                    display: 'flex',
-                    justifyContent: 'flex-start',
-                    flexWrap: 'wrap',
-                    listStyle: 'none',
-                    p: 0.5,
-                    m: 0,
-                }}
-                component="ul"
-            >
-                {sourceList.length > 0 ? sourceList.map(element => (
-                    <ListItemStyled key={element}>
-                        <Chip
-                            label={element}
-                            // {...getClickListener(type)}
-                            onClick={type === 'add' ? changeFilter(element, fromSetter, toSetter) : undefined}
-                            onDelete={type === 'delete' ? changeFilter(element, fromSetter, toSetter) : undefined}
+            <Autocomplete
+                sx={{width: '100%', p: '1rem'}}
+                clearOnEscape
+                disableCloseOnSelect
+                autoHighlight
+                multiple
+                options={sourceList}
+                onChange={(event, selectedValue) => setter(selectedValue)}
+                renderOption={(props, option, { selected }) => (
+                    <li {...props}>
+                        <Checkbox
+                            icon={icon}
+                            checkedIcon={checkedIcon}
+                            style={{ marginRight: 8 }}
+                            checked={selected}
                         />
-                    </ListItemStyled>
-                )) : <span>None</span>
-                }
-            </Paper>
-        </>
+                        {option}
+                    </li>
+                )}
+                renderInput={(params) => (
+                    <TextField {...params} hiddenLabel label={`Select ${title}`} />
+                )}
+            />
+        </Box>
     )
 }

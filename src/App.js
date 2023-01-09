@@ -15,10 +15,21 @@ import ScrollToTop from "./utility/ScrollToTop";
 
 import { createTheme, responsiveFontSizes, ThemeProvider } from '@mui/material/styles';
 
-axios.defaults.timeout = 6000; // set axios timeout in ms
+axios.defaults.timeout = 10000; // set axios timeout in ms
 
 // set responsiveness sizes for text
-let theme = createTheme();
+let theme = createTheme({
+  breakpoints: {
+    values: {
+      xs: 0,
+      sm: 600,
+      md: 900,
+      lg: 1200,
+      xl: 1536,
+      xxl: 2000
+    },
+  },
+});
 theme = responsiveFontSizes(theme);
 
 let queryKeys = []; // becomes ['a', 'b', 'c', 'd', ... 0, 1, 2, 3 ...]
@@ -44,7 +55,7 @@ function App() {
       return {
         queryKey: ['drinks', key],
         queryFn: () => getData(`https://www.thecocktaildb.com/api/json/v2/9973533/search.php?f=${key}`),
-        refetchOnWindowFocus: false
+        refetchOnWindowFocus: false, // re-enable this for production
       }
     })
   })
@@ -76,9 +87,9 @@ function App() {
   }, [allDrinksData, allDrinks, setAllDrinks]);
   
   
-  useEffect(() => {
-    console.log('ready', allDrinks);
-  },[allDrinks])
+  // useEffect(() => {
+  //   console.log('ready', allDrinks);
+  // },[allDrinks])
 
   const getData = async (url) => {
     try {

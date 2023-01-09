@@ -1,8 +1,7 @@
-
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useQueries, useQuery } from '@tanstack/react-query'
 import axios from 'axios';
-
+import Spinner from './Spinner';
 import { titleCase } from '../utility/customMethods';
 
 // https://unsplash.com/photos/Sr3bhcYqftA
@@ -20,14 +19,10 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import Checkbox from '@mui/material/Checkbox';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import TextField from '@mui/material/TextField';
-import Autocomplete from '@mui/material/Autocomplete';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Grid from '@mui/material/Grid';
-import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
-import CheckBoxIcon from '@mui/icons-material/CheckBox';
 
 let filterQueryKeys = [
     'c', // category
@@ -35,40 +30,52 @@ let filterQueryKeys = [
     'i' // ingredients
 ];
 
-const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
-const checkedIcon = <CheckBoxIcon fontSize="small" />;
-
 export default function AdvSearch({ allDrinks }) {
 
     const alcoholContentFilter = [{ label: 'Alcoholic', buttonIndex: 0 }, { label: 'Optional Alcohol', buttonIndex: 1 }, { label: 'Non-alcoholic', buttonIndex: 2 }];
-    const [selectedAlcoholContent, setSelectedAlcoholContent] = useState([]);
-
-    // For ingredients search
-    const [selectedValue, setSelectedValue] = useState(''); // value selected by user
-    const [typedValue, setTypedValue] = useState(''); // value typed by user
+    const [selectedAlcoholContent, setSelectedAlcoholContent] = useState([0, 1, 2]);
 
     // Lists from the API to populate filters
-    const [categoryList, setCategoryList] = useState(null);
+    const [drinkTypeList, setDrinkTypeList] = useState(null);
     const [glassTypeList, setGlassTypeList] = useState(null);
     const [ingredientsList, setIngredientsList] = useState(null);
 
-    // Drinks by ingredient from the API
+    // Drinks returned from the API that match selected ingredients
     const [drinksByIngredient, setDrinksByIngredient] = useState(null);
 
     // Selected filter items
-    const [selectedCategories, setSelectedCategories] = useState([]);
+    const [selectedDrinkTypes, setSelectedDrinkTypes] = useState([]);
     const [selectedGlassTypes, setSelectedGlassTypes] = useState([]);
     const [selectedIngredients, setSelectedIngredients] = useState([]);
 
-    const [loading, setLoading] = useState(true); // bool
-    const [error, setError] = useState(null); // string
-    const [visibleDrinks, setVisibleDrinks] = useState([]);
+    // drinks that are visible to the user
+    const [visibleDrinks, setVisibleDrinks] = useState(null);
 
     const getData = async (url) => {
-        console.log('fetching data');
+        // console.log('fetching data');
         const response = await axios.get(url);
         return response.data.drinks;
     };
+
+    function formatData(data) {
+
+        // if data is fine
+        if (Array.isArray(data)) {
+            const dataType = Object.keys(data[0])[0]; // drink category, glass type, ingredients
+            switch (dataType) {
+                case 'strCategory':
+                    setDrinkTypeList(data.map(el => el.strCategory))
+                    break;
+                case 'strGlass':
+                    setGlassTypeList(data.map(el => el.strGlass))
+                    break;
+                case 'strIngredient1':
+                    setIngredientsList(data.map(el => el.strIngredient1))
+                    break;
+                default:
+            }
+        }
+    }
 
     const filterData = useQueries({
         queries: filterQueryKeys.map(key => {
@@ -76,13 +83,14 @@ export default function AdvSearch({ allDrinks }) {
                 queryKey: [key],
                 queryFn: () => getData(`https://www.thecocktaildb.com/api/json/v2/9973533/list.php?${key}=list`),
                 refetchOnWindowFocus: false,
-                refetchOnMount: false
+                refetchOnMount: true,
+                onSuccess: data => formatData(data)
             }
         })
     })
 
     const setDrinksByIngredientData = (data) => {
-        console.log(data)
+        // console.log('fetchedIngredientDrinks', data)
         // if data is an array then data is correct and set state
         if (Array.isArray(data)) {
             const drinksArray = data.map(el => el.strDrink);
@@ -95,7 +103,6 @@ export default function AdvSearch({ allDrinks }) {
         // if there is no data and the variable is null or already has data, then set data as empty array
         if (data === 'None Found') {
             setDrinksByIngredient([]);
-            return
         }
 
     }
@@ -107,84 +114,22 @@ export default function AdvSearch({ allDrinks }) {
         refetchOnMount: false,
         onSuccess: (data) => setDrinksByIngredientData(data)
     })
-    
-    useEffect(() => {
-        console.log('selectedValue', selectedValue);
-    }, [selectedValue])
-    
-    useEffect(() => {
-        console.log('ingredientsList', ingredientsList);
-    }, [ingredientsList])
 
-    useEffect(() => {
-        // console.log(ingredientFilteredDrinks.isFetching, ingredientFilteredDrinks.isLoading, ingredientFilteredDrinks.status, ingredientFilteredDrinks.data);
-    }, [ingredientFilteredDrinks])
+    // useEffect(() => {
+    //     console.log('visibleDrinks', visibleDrinks)
+    // }, [visibleDrinks])
 
-    useEffect(() => {
-        console.log('visibleDrinks', visibleDrinks)
-    }, [visibleDrinks])
+    // useEffect(() => {
+    //     console.log('filterData', filterData)
+    // }, [filterData])
 
-    useEffect(() => {
-        console.log('drinksByIngredient', drinksByIngredient)
-    }, [drinksByIngredient])
+    // useEffect(() => {
+    //     console.log('ingredientFilteredDrinks', ingredientFilteredDrinks)
+    // }, [ingredientFilteredDrinks])
 
-    useEffect(() => {
-
-        let canSetData = false;
-        let loading = false;
-        let error = null;
-
-        // check for errors and loading
-        // checking if it's loading, has an error, or if the data was loaded with an array or not
-        for (let i = 0; i < filterData.length; i++) {
-            if (filterData[i].data) {
-                if (Array.isArray(filterData[i].data)) {
-                    canSetData = true;
-                } else {
-                    canSetData = false;
-                    break;
-                }
-            }
-
-            if (filterData[i].isError) {
-                error = filterData[i].error;
-                break;
-            } else if (filterData[i].isLoading) {
-                loading = true;
-                break;
-            } else if (filterData[i].data) {
-                if (filterData[i].data.message === 'timeout of 6000ms exceeded') {
-                    error = 'Timeout fetching data';
-                    break;
-                } else if (filterData[i].data.message === 'Network Error') {
-                    error = 'A network error occured';
-                    break;
-                }
-            }
-        }
-
-        setLoading(loading)
-        setError(error);
-
-        // If all three are okay, then data can be set
-        if (!loading && !error && canSetData && !categoryList && !glassTypeList && !ingredientsList) {
-            filterData.forEach(el => {
-                const dataType = Object.keys(el.data[0])[0]; // drink category, glass type, ingredients
-                switch (dataType) {
-                    case 'strCategory':
-                        setCategoryList(el.data.map(el => el.strCategory))
-                        break;
-                    case 'strGlass':
-                        setGlassTypeList(el.data.map(el => el.strGlass))
-                        break;
-                    case 'strIngredient1':
-                        setIngredientsList(el.data.map(el => el.strIngredient1))
-                        break;
-                    default:
-                }
-            })
-        }
-    }, [filterData, categoryList, glassTypeList, ingredientsList])
+    // useEffect(() => {
+    //     console.log('lists', drinkTypeList, glassTypeList, ingredientsList)
+    // }, [drinkTypeList, glassTypeList, ingredientsList])
 
     // applies filters to drinks
     useEffect(() => {
@@ -207,20 +152,20 @@ export default function AdvSearch({ allDrinks }) {
         })
 
         // Filter for Drink Types
-        if (selectedCategories.length > 0) {
-            newVisibleDrinks = newVisibleDrinks.filter(el => selectedCategories.includes(el.strCategory))
+        if (selectedDrinkTypes.length > 0) {
+            newVisibleDrinks = newVisibleDrinks.filter(el => selectedDrinkTypes.includes(el.strCategory))
         }
         // Filter for Glass Types
         if (selectedGlassTypes.length > 0) {
             newVisibleDrinks = newVisibleDrinks.filter(el => selectedGlassTypes.includes(el.strGlass))
         }
         // Filter for Ingredients
-        if (selectedIngredients.length > 0) {
+        if (selectedIngredients.length > 0 && drinksByIngredient) {
             newVisibleDrinks = newVisibleDrinks.filter(el => drinksByIngredient.includes(el.strDrink))
         }
 
         setVisibleDrinks(newVisibleDrinks);
-    }, [selectedAlcoholContent, allDrinks, selectedCategories, selectedGlassTypes, selectedIngredients, drinksByIngredient])
+    }, [selectedAlcoholContent, allDrinks, selectedDrinkTypes, selectedGlassTypes, selectedIngredients, drinksByIngredient])
 
     const handleAlcoholContentToggle = (value) => () => {
         const currentIndex = selectedAlcoholContent.indexOf(value); // get the position in the array the button number (value) resides (returns -1 if doesn't exists)
@@ -248,6 +193,49 @@ export default function AdvSearch({ allDrinks }) {
 
     const isSearchedIngredient = ingredient => selectedIngredients.includes(ingredient);
 
+    function checkError(data) {
+
+        let error = {
+            isError: false,
+            message: ''
+        }
+
+        for (let i = 0; i < data.length; i++) {
+            if (data[i]?.isError) {
+                error.isError = true;
+                error.message = data[i].error;
+                break;
+            }
+            if (data[i]?.data?.message?.includes('timeout')) {
+                error.isError = true;
+                error.message = 'Timeout fetching data';
+                break;
+            }
+            if (data[i]?.data?.message?.includes('Network Error')) {
+                error.isError = true;
+                error.message = 'A network error occured';
+                break;
+            }
+        }
+        return error;
+    }
+
+    const checkLoading = (data) => data.some(data => data.isLoading);
+
+    const filtersIsError = checkError(filterData);
+    const filtersIsLoading = checkLoading(filterData);
+
+    const resultsPromp = (
+        selectedAlcoholContent.length === 0 ? <Box>To get started, select an Alcohol Content filter.</Box> :
+        visibleDrinks === null ? (
+                <Box>
+                    <Box>Loading Drinks</Box>
+                    <Spinner loading />
+                </Box>
+            ) :
+        visibleDrinks ? `${visibleDrinks.length} drinks found.` : '' // X drinks found
+    )
+
     return (
         <Box sx={{
             display: 'flex',
@@ -255,6 +243,9 @@ export default function AdvSearch({ allDrinks }) {
             justifyContent: 'center',
             flexDirection: 'column',
             backgroundColor: '#e7ecef',
+            background: `linear-gradient(rgba(0, 0, 0, .4), rgba(0, 0, 0, .4)), url(${HomeBackground})`,
+            backgroundPosition: 'center',
+            backgroundSize: 'cover',
 
         }}>
             <Nav />
@@ -262,130 +253,97 @@ export default function AdvSearch({ allDrinks }) {
                 color: 'inherit',
                 mt: { xs: '56px', sm: '64px', md: '71px', lg: '80px' },
                 width: '100%',
-                display: "flex",
-                alignItems: "flex-start",
-                justifyContent: "center",
-                height: "100vh",
-                background: `
-                linear-gradient(rgba(0, 0, 0, .4), rgba(0, 0, 0, .4)),
-                url(${HomeBackground})`,
-                backgroundPosition: 'center',
-                backgroundSize: 'cover'
+                display: 'flex',
+                flexDirection: { xs: 'column', md: 'row' },
+                minHeight: '100vh',
+                height: '100%'
             }}>
+
+                {/*
+                xs: 0,
+                sm: 600,
+                md: 900,
+                lg: 1200,
+                xl: 1536,
+                xxl: 2000
+                */}
 
                 {/* Alcohol Content Filter */}
 
-                <Box sx={{ background: 'orange', height: '100%', minWidth: '300px', maxWidth: '400px' }}>
-                    <Typography component="div" variant="h4">
-                        Filter by:
+                <Box sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    bgcolor: 'white',
+                    minWidth: { sm: '100%', md: '300px' },
+                    position: { md: 'sticky' },
+                    top: { md: '71px', lg: '80px' } // used only with position: sticky
+                }}>
+                    <Typography sx={{ py: '2rem' }} component="div" variant="h4">
+                        Filters
                     </Typography>
                     <Typography component="div" variant="h6">
                         Alcohol Content
                     </Typography>
-                    <List sx={{ width: '100%', bgcolor: 'white' }}>
+                    <List >
                         {alcoholContentFilter.map(({ label, buttonIndex }) => {
                             return (
-                                <ListItem
-                                    key={buttonIndex}
-                                    disablePadding
-                                >
-                                    <ListItemButton sx={{ color: '' }} role={undefined} onClick={handleAlcoholContentToggle(buttonIndex)} dense>
-                                        <Checkbox
-                                            edge="start"
-                                            checked={selectedAlcoholContent.indexOf(buttonIndex) !== -1} // if the button's index exists in the button array, then check it
-                                            tabIndex={-1}
-                                            disableRipple
-                                            inputProps={{ 'aria-labelledby': label }}
-                                        />
-                                        <ListItemText id={label} primary={label} />
-                                    </ListItemButton>
-                                </ListItem>
+                                <Box sx={{ display: 'flex', flexDirection: 'row' }}>
+                                    <ListItem
+                                        key={buttonIndex}
+                                        disablePadding
+                                    >
+                                        <ListItemButton sx={{ color: 'inherit' }} role={undefined} onClick={handleAlcoholContentToggle(buttonIndex)} dense>
+                                            <Checkbox
+                                                edge="start"
+                                                checked={selectedAlcoholContent.indexOf(buttonIndex) !== -1}
+                                                tabIndex={-1}
+                                                disableRipple
+                                                inputProps={{ 'aria-labelledby': label }}
+                                            />
+                                            <ListItemText id={label} primary={label} />
+                                        </ListItemButton>
+                                    </ListItem>
+                                </Box>
                             );
                         })}
                     </List>
 
                     {/* Other filters */}
                     {
-                        loading ? <Box>'Loading'</Box>
-                            : error ? <Box>{error}</Box>
-                                : categoryList && glassTypeList && ingredientsList ? (
+                        filtersIsLoading ? (
+                            <>
+                                <Box>Loading Filters</Box>
+                                <Spinner loading />
+                            </>
+                        )
+                            : filtersIsError.isError ? <Box>{filtersIsError.message}</Box>
+                                : drinkTypeList && glassTypeList && ingredientsList ? (
                                     <>
-                                        <Filter
-                                            title='Added Drink Types'
-                                            type='delete'
-                                            sourceList={selectedCategories}
-                                            fromSetter={setSelectedCategories}
-                                            toSetter={setCategoryList}
-                                        />
-
-                                        <Filter
-                                            title="Drink Types"
-                                            type='add'
-                                            sourceList={categoryList}
-                                            fromSetter={setCategoryList}
-                                            toSetter={setSelectedCategories}
-                                        />
-
-                                        <Filter
-                                            title='Added Glass Types'
-                                            type='delete'
-                                            sourceList={selectedGlassTypes}
-                                            fromSetter={setSelectedGlassTypes}
-                                            toSetter={setGlassTypeList}
-                                        />
-
-                                        <Filter
-                                            title="Glass Types"
-                                            type='add'
-                                            sourceList={glassTypeList}
-                                            fromSetter={setGlassTypeList}
-                                            toSetter={setSelectedGlassTypes}
-                                        />
-                                        {/* Add a drop down here to search for and select ingredients */}
-                                        <Typography component="div" variant="h6">
-                                            Ingredients
-                                        </Typography>
-
-                                        <Autocomplete
-                                            clearOnEscape
-                                            disableCloseOnSelect
-                                            autoHighlight
-                                            clearOnBlur // not sure what this does
-                                            multiple
-                                            options={ingredientsList}
-                                            onChange={(event, selectedValue) => setSelectedIngredients(selectedValue)}
-                                            renderOption={(props, option, { selected }) => (
-                                                <li {...props}>
-                                                    <Checkbox
-                                                        icon={icon}
-                                                        checkedIcon={checkedIcon}
-                                                        style={{ marginRight: 8 }}
-                                                        checked={selected}
-                                                    />
-                                                    {option}
-                                                </li>
-                                            )}
-                                            renderInput={(params) => (
-                                                <TextField {...params} hiddenLabel label="Select ingredients"/>
-                                            )}
-                                        />
+                                        <Filter title={'Drink Type'} sourceList={drinkTypeList} setter={setSelectedDrinkTypes} />
+                                        <Filter title={'Glass Type'} sourceList={glassTypeList} setter={setSelectedGlassTypes} />
+                                        <Filter title={'Ingredients'} sourceList={ingredientsList} setter={setSelectedIngredients} />
                                     </>
-                                ) : ''
+                                ) : (
+                                    <>
+                                        Loading Filters
+                                        <Spinner loading />
+                                    </>
+                                )
                     }
-
                 </Box>
 
                 {/* Results */}
 
-                <Box sx={{ bgcolor: 'white', height: '100%', width: '70%', overflow: "scroll" }}>
-                    <Typography component="div" variant="h5">
-                        {visibleDrinks.length === 0 ? 'To see results, first add an \'Alcohol Content\' filter, then refine using the filters below this.' : `${visibleDrinks.length} drinks found.`}
+                <Box sx={{ bgcolor: 'white', minHeight: '100vh', height: '100%', width: '100%' }}>
+                    <Typography sx={{ py: '2rem', textAlign: 'center' }} component="div" variant="h5">
+                        {resultsPromp}
                     </Typography>
-                    <Grid container spacing={0} >
-                        {visibleDrinks.map((drink) => (
-
-                            <Grid item xs={12} sm={12} md={6} key={drink.idDrink}>
-                                <Box sx={{ p: 2, bgcolor: 'white' }} >
+                    <Grid container>
+                        {visibleDrinks?.map((drink) => (
+                            <Grid item xs={12} lg={6} xl={6} xxl={4} key={drink.idDrink} >
+                                <Box sx={{ p: 1 }} >
+                                    {/* This currently isn't working. Need to figure out how to nest a link inside a link */}
                                     <Card sx={{ display: 'flex', bgcolor: '' }}>
                                         <CardMedia
                                             component="img"
@@ -395,17 +353,21 @@ export default function AdvSearch({ allDrinks }) {
                                         />
                                         <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
                                             <CardContent sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                                                <Typography component="div" variant="h5">
-                                                    {drink.strDrink}
-                                                </Typography>
-                                                <UnstyledLink to={`/search/${drink.idDrink}`} target="_blank" rel="noopener noreferrer"><OpenInNewIcon /></UnstyledLink>
+                                                <UnstyledLink to={`/search/${drink.idDrink}`}>
+                                                    <Typography component="div" variant="h5">
+                                                        {drink.strDrink}
+                                                    </Typography>
+                                                </UnstyledLink>
+                                                <UnstyledLink target="_blank" rel="noopener noreferrer" to={`/search/${drink.idDrink}`}>
+                                                    <OpenInNewIcon />
+                                                </UnstyledLink>
                                             </CardContent>
-                                            <CardContent sx={{ pt: 0 }}>
+                                            <CardContent>
                                                 <Typography variant="subtitle1" color="text.secondary" component="div">
                                                     {/* Assign green color if ingredient select, red if not
                                                 Redo this code when I add more filters */}
                                                     {getIngredientsArray(drink).map((el, index, array) => (
-                                                        <Box component="span" sx={{
+                                                        <Box key={index} component="span" sx={{
                                                             color: isSearchedIngredient(el)
                                                                 ? 'violet'
                                                                 : 'inherit',
