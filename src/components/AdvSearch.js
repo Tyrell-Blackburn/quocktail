@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { useQueries, useQuery } from '@tanstack/react-query'
 import axios from 'axios';
 import Spinner from './Spinner';
@@ -118,6 +118,10 @@ export default function AdvSearch({ allDrinks }) {
     // useEffect(() => {
     //     console.log('visibleDrinks', visibleDrinks)
     // }, [visibleDrinks])
+
+    useEffect(() => {
+        // console.log('visibleDrinks', visibleDrinks)
+    }, [ingredientFilteredDrinks])
 
     // useEffect(() => {
     //     console.log('filterData', filterData)

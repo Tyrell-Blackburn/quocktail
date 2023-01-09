@@ -26,7 +26,7 @@ import formatInstructions from "../utility/formatInstructions";
 import HomeBackground from '../images/home-background.png'
 
 import Paper from '@mui/material/Paper';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 const Img = styled('img')({
     borderRadius: '8px',

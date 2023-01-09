@@ -4,9 +4,9 @@ export const titleCase = (string) => {
     }).join(' ');
 }
 
-const changeFilter = (elementToMove, fromSetter, toSetter) => () => {
-    // remove from source
-    fromSetter(prevState => prevState.filter(sourceElement => sourceElement !== elementToMove))
-    // add to destination
-    toSetter(prevState => [...prevState, elementToMove]);
-};
+// const changeFilter = (elementToMove, fromSetter, toSetter) => () => {
+//     // remove from source
+//     fromSetter(prevState => prevState.filter(sourceElement => sourceElement !== elementToMove))
+//     // add to destination
+//     toSetter(prevState => [...prevState, elementToMove]);
+// };

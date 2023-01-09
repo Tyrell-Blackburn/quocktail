@@ -7,17 +7,16 @@ import Typography from "@mui/material/Typography";
 import Menu from "@mui/material/Menu";
 import MenuIcon from "@mui/icons-material/Menu";
 import Container from "@mui/material/Container";
-import Avatar from "@mui/material/Avatar";
-import Tooltip from "@mui/material/Tooltip";
+// import Avatar from "@mui/material/Avatar";
+// import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 
 import { NavButton, theme, UnstyledLink } from "./StyledComponents";
 import logo from '../images/logo-quocktail.png';
-import favoritesEmptyIcon from '../images/icon-favorites-empty.png';
-import favoritesFullIcon from '../images/icon-favorites-full.png';
+// import favoritesEmptyIcon from '../images/icon-favorites-empty.png';
+// import favoritesFullIcon from '../images/icon-favorites-full.png';
 
-// Attribution for when add favorites
-{/* <a href="https://www.flaticon.com/free-icons/heart" title="heart icons">Heart icons created by Kiranshastry - Flaticon</a> */ }
+// Attribution of icon for when add favorites
 
 const pages = [
     "Home",
@@ -26,7 +25,7 @@ const pages = [
     "Discover",
 ];
 
-const settings = ["Favorites", "Logout"];
+// const settings = ["Favorites", "Logout"];
 
 const determineLink = (page) => {
     let link;
@@ -51,22 +50,22 @@ const determineLink = (page) => {
 
 export default function Nav() {
     const [anchorElNav, setAnchorElNav] = useState(null);
-    const [anchorElUser, setAnchorElUser] = useState(null);
+    // const [anchorElUser, setAnchorElUser] = useState(null);
 
     const handleOpenNavMenu = (event) => {
         setAnchorElNav(event.currentTarget);
     };
-    const handleOpenUserMenu = (event) => {
-        setAnchorElUser(event.currentTarget);
-    };
+    // const handleOpenUserMenu = (event) => {
+    //     setAnchorElUser(event.currentTarget);
+    // };
 
     const handleCloseNavMenu = () => {
         setAnchorElNav(null);
     };
 
-    const handleCloseUserMenu = () => {
-        setAnchorElUser(null);
-    };
+    // const handleCloseUserMenu = () => {
+    //     setAnchorElUser(null);
+    // };
 
     return (
         <AppBar position="fixed" sx={{
