@@ -125,7 +125,7 @@ function App() {
                 <ScrollToTop />
                 <Routes>
                   <Route path="/" element={<Home allDrinks={allDrinks} />} />
-                  <Route path="/search" element={<Search allDrinks={allDrinks} />} />
+                  {/* <Route path="/search" element={<Search allDrinks={allDrinks} />} /> */}
                   <Route path="/search/:id" element={<Search allDrinks={allDrinks} />} />
                   <Route path="/advsearch" element={<AdvSearch allDrinks={allDrinks} />} />
                   <Route path="/random" element={<RandomDrink />} />

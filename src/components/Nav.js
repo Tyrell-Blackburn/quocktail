@@ -20,8 +20,8 @@ import logo from '../images/logo-quocktail.png';
 
 const pages = [
     "Home",
-    "Search",
-    "Advanced Search",
+    // "Search",
+    "Filtered Search",
     "Discover",
 ];
 
@@ -33,10 +33,10 @@ const determineLink = (page) => {
         case "Home":
             link = '/'
             break;
-        case "Search":
-            link = '/search'
-            break;
-        case "Advanced Search":
+        // case "Search":
+        //     link = '/search'
+        //     break;
+        case "Filtered Search":
             link = '/advsearch'
             break;
         case "Discover":
