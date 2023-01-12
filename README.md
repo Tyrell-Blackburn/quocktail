@@ -1,6 +1,6 @@
 # Quocktail
 
-Quocktail is designed to help bartenders and mixologist locate cocktail recipes quickly. Cocktails themselves are dear to my heart, and like with cooking, I enjoy experimenting with and making cocktails at home. Check it out [here](https://www.quocktail.com).
+Quocktail is designed to help bartenders and mixologist locate cocktail recipes quickly. Cocktails themselves are dear to my heart, and I enjoy experimenting with and making cocktails at home. Check it out [here](https://www.quocktail.com).
 
 This is my first original project using React.js, Material UI, and Tanstack Router (what an incredible library!).
 It leverages the [TheCocktailDB](https://www.thecocktaildb.com/) for all recipe text and images.
